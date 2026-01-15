@@ -1,0 +1,561 @@
+# Sample OpenAPI Specification - Pet Store API
+# 
+# This is a sample OpenAPI specification used for testing and demonstration
+# of the MCP REST Adapter. It defines a simple pet store API with operations
+# for managing pets, including listing, creating, updating, and deleting pets.
+# 
+# This specification will be automatically parsed by the MCP adapter to generate
+# corresponding MCP tools that LLM agents can discover and invoke.
+# 
+# @author Neeraj Yadav
+# @version 1.0.0
+# @since 2025-12-16
+
+openapi: 3.0.3
+info:
+  title: Pet Store API
+  description: |
+    A sample Pet Store Server based on the OpenAPI 3.0 specification.
+    
+    This API provides operations for managing a pet store inventory,
+    including pets, categories, and orders. It demonstrates various
+    OpenAPI features that the MCP adapter can handle:
+    
+    - Path parameters and query parameters
+    - Request bodies with different content types
+    - Response schemas with validation
+    - Authentication requirements
+    - Error responses
+    
+    When processed by the MCP REST Adapter, each operation becomes
+    a discoverable MCP tool that LLM agents can invoke.
+  version: 1.0.0
+  contact:
+    name: Neeraj Yadav
+    email: neeraj@example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://petstore.swagger.io/v2
+    description: Production server
+  - url: https://staging-petstore.swagger.io/v2
+    description: Staging server
+
+paths:
+  /pet:
+    post:
+      tags:
+        - pet
+      summary: Add a new pet to the store
+      description: |
+        Creates a new pet in the store inventory. The pet must have a name
+        and at least one photo URL. Categories and tags are optional but
+        recommended for better organization.
+      operationId: addPet
+      requestBody:
+        description: Pet object that needs to be added to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+            example:
+              name: "Fluffy"
+              category:
+                id: 1
+                name: "Cats"
+              photoUrls:
+                - "https://example.com/photos/fluffy1.jpg"
+              tags:
+                - id: 1
+                  name: "friendly"
+              status: "available"
+      responses:
+        '200':
+          description: Pet created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
+
+    put:
+      tags:
+        - pet
+      summary: Update an existing pet
+      description: |
+        Updates an existing pet in the store. The pet ID must exist,
+        and all required fields must be provided.
+      operationId: updatePet
+      requestBody:
+        description: Pet object that needs to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+      responses:
+        '200':
+          description: Pet updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Pet not found
+        '422':
+          description: Validation exception
+      security:
+        - api_key: []
+
+  /pet/findByStatus:
+    get:
+      tags:
+        - pet
+      summary: Finds pets by status
+      description: |
+        Returns a list of pets filtered by their status. Multiple status
+        values can be provided to get pets in any of those states.
+        
+        This operation demonstrates query parameter handling and
+        array parameter serialization in the MCP adapter.
+      operationId: findPetsByStatus
+      parameters:
+        - name: status
+          in: query
+          description: Status values that need to be considered for filter
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - available
+                - pending
+                - sold
+            default: ["available"]
+        - name: limit
+          in: query
+          description: Maximum number of pets to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
+
+  /pet/findByTags:
+    get:
+      tags:
+        - pet
+      summary: Finds pets by tags
+      description: |
+        Returns pets that have any of the specified tags. This operation
+        is useful for finding pets with specific characteristics.
+        
+        **Note:** This operation is deprecated and may be removed in future versions.
+        Use the search endpoint instead.
+      operationId: findPetsByTags
+      deprecated: true
+      parameters:
+        - name: tags
+          in: query
+          description: Tags to filter by
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+        '400':
+          description: Invalid tag value
+      security:
+        - api_key: []
+
+  /pet/{petId}:
+    get:
+      tags:
+        - pet
+      summary: Find pet by ID
+      description: |
+        Returns a single pet by its ID. This demonstrates path parameter
+        handling in the MCP adapter.
+      operationId: getPetById
+      parameters:
+        - name: petId
+          in: path
+          description: ID of pet to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Pet not found
+      security:
+        - api_key: []
+
+    post:
+      tags:
+        - pet
+      summary: Updates a pet in the store with form data
+      description: |
+        Updates pet information using form data. This demonstrates
+        form parameter handling in the MCP adapter.
+      operationId: updatePetWithForm
+      parameters:
+        - name: petId
+          in: path
+          description: ID of pet that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Updated name of the pet
+                status:
+                  type: string
+                  description: Updated status of the pet
+                  enum:
+                    - available
+                    - pending
+                    - sold
+      responses:
+        '200':
+          description: Pet updated successfully
+        '400':
+          description: Invalid input
+      security:
+        - api_key: []
+
+    delete:
+      tags:
+        - pet
+      summary: Deletes a pet
+      description: |
+        Removes a pet from the store inventory. This operation cannot be undone.
+      operationId: deletePet
+      parameters:
+        - name: api_key
+          in: header
+          description: API key for authentication
+          required: false
+          schema:
+            type: string
+        - name: petId
+          in: path
+          description: Pet id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Pet deleted successfully
+        '400':
+          description: Invalid pet ID
+        '404':
+          description: Pet not found
+      security:
+        - api_key: []
+
+  /store/inventory:
+    get:
+      tags:
+        - store
+      summary: Returns pet inventories by status
+      description: |
+        Returns a map of status codes to quantities. This demonstrates
+        how the MCP adapter handles responses with dynamic keys.
+      operationId: getInventory
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+                example:
+                  available: 10
+                  pending: 5
+                  sold: 3
+      security:
+        - api_key: []
+
+  /store/order:
+    post:
+      tags:
+        - store
+      summary: Place an order for a pet
+      description: |
+        Creates a new order for purchasing a pet. The order includes
+        pet ID, quantity, and shipping information.
+      operationId: placeOrder
+      requestBody:
+        description: Order placed for purchasing the pet
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '200':
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid order
+        '422':
+          description: Validation exception
+
+  /store/order/{orderId}:
+    get:
+      tags:
+        - store
+      summary: Find purchase order by ID
+      description: |
+        Returns details of a specific order by its ID.
+      operationId: getOrderById
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of order that needs to be fetched
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            maximum: 10
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Order not found
+
+    delete:
+      tags:
+        - store
+      summary: Delete purchase order by ID
+      description: |
+        Cancels and removes an order from the system.
+      operationId: deleteOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the order that needs to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Order deleted successfully
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Order not found
+
+components:
+  schemas:
+    Pet:
+      type: object
+      required:
+        - name
+        - photoUrls
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+          description: Unique identifier for the pet
+        name:
+          type: string
+          example: "Fluffy"
+          description: Name of the pet
+          minLength: 1
+          maxLength: 50
+        category:
+          $ref: '#/components/schemas/Category'
+        photoUrls:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: URLs of photos of the pet
+          minItems: 1
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          description: Tags associated with the pet
+        status:
+          type: string
+          description: Pet status in the store
+          enum:
+            - available
+            - pending
+            - sold
+          default: available
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "Dogs"
+          minLength: 1
+          maxLength: 30
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          minLength: 1
+          maxLength: 20
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        petId:
+          type: integer
+          format: int64
+          example: 198772
+        quantity:
+          type: integer
+          format: int32
+          example: 7
+          minimum: 1
+          maximum: 100
+        shipDate:
+          type: string
+          format: date-time
+          description: Estimated ship date
+        status:
+          type: string
+          description: Order Status
+          example: approved
+          enum:
+            - placed
+            - approved
+            - delivered
+        complete:
+          type: boolean
+          default: false
+          description: Whether the order has been completed
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Error code
+        message:
+          type: string
+          description: Error message
+        details:
+          type: string
+          description: Additional error details
+
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
+      description: |
+        API key authentication. Include your API key in the 'api_key' header.
+        
+        Example: api_key: your-secret-api-key
+
+# Global security requirement (can be overridden per operation)
+security:
+  - api_key: []

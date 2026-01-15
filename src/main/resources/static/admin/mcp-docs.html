@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+    MCP Server Documentation - REST API Endpoints
+    
+    Author: Neeraj Yadav
+    Version: 1.0.0
+    Created: 2025-01-08
+    
+    Comprehensive documentation for MCP REST Adapter API endpoints
+    including tool management, execution, configuration, monitoring, and streaming.
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Server Documentation - REST API Endpoints</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-600: #2563eb;
+            --primary-700: #1d4ed8;
+            --success-500: #10b981;
+            --warning-500: #f59e0b;
+            --error-500: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+            color: var(--gray-900);
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .method-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .method-get { background: #10b981; color: white; }
+        .method-post { background: #3b82f6; color: white; }
+        .method-put { background: #f59e0b; color: white; }
+        .method-delete { background: #ef4444; color: white; }
+        
+        .endpoint-card {
+            border-left: 4px solid var(--primary-600);
+            transition: all 0.3s ease;
+        }
+        
+        .endpoint-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="glass sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-book text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">MCP Server Documentation</h1>
+                            <p class="text-sm text-gray-600">Complete REST API Endpoints Reference</p>
+                        </div>
+                    </div>
+                    <a href="/admin" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Admin
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+            <!-- Overview -->
+            <div class="glass rounded-xl p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">MCP REST Adapter API Overview</h2>
+                <p class="text-gray-700 mb-6">
+                    The MCP REST Adapter provides a comprehensive REST API for managing and executing Model Context Protocol (MCP) tools. 
+                    This documentation covers all available endpoints organized by functional categories.
+                </p>
+                
+                <!-- Download Section -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-download text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">Postman Collection</h3>
+                                <p class="text-gray-600">Ready-to-use collection with all API endpoints, sample requests, and test scripts.</p>
+                            </div>
+                        </div>
+                        <a href="/admin/MCP_REST_Adapter_API.postman_collection.json" 
+                           download="MCP_REST_Adapter_API.postman_collection.json"
+                           class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center space-x-2">
+                            <i class="fas fa-download"></i>
+                            <span>Download Collection</span>
+                        </a>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-600">
+                        <strong>Import Instructions:</strong> Download the collection → Open Postman → File → Import → Select the downloaded JSON file
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600">9</div>
+                        <div class="text-sm text-gray-600">Core MCP Endpoints</div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600">5</div>
+                        <div class="text-sm text-gray-600">Streaming Endpoints</div>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-yellow-600">11</div>
+                        <div class="text-sm text-gray-600">Configuration Endpoints</div>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-purple-600">7</div>
+                        <div class="text-sm text-gray-600">Monitoring Endpoints</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Core MCP Protocol Endpoints -->
+            <div class="glass rounded-xl p-8 mb-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-cogs text-blue-600 mr-2"></i>Core MCP Protocol Endpoints
+                </h3>
+                <p class="text-gray-600 mb-6">Base path: <code class="bg-gray-100 px-2 py-1 rounded">/api/v1/mcp</code></p>
+                
+                <div class="space-y-4">
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/tools</code>
+                            </div>
+                            <i class="fas fa-list text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">List All Available Tools</h4>
+                        <p class="text-gray-600 mb-3">Returns a list of all MCP tools available for invocation with optional name pattern filtering.</p>
+                        <div class="text-sm text-gray-500">
+                            <strong>Query Parameters:</strong> namePattern (optional)
+                        </div>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/tools/{toolName}</code>
+                            </div>
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Get Specific Tool Details</h4>
+                        <p class="text-gray-600 mb-3">Returns detailed information about a specific tool including schema and metadata.</p>
+                        <div class="text-sm text-gray-500">
+                            <strong>Path Parameters:</strong> toolName (required)
+                        </div>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-post">POST</span>
+                                <code class="text-lg font-mono">/tools/{toolName}/invoke</code>
+                            </div>
+                            <i class="fas fa-play text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Execute Tool</h4>
+                        <p class="text-gray-600 mb-3">Executes a tool with the provided parameters and returns the result.</p>
+                        <div class="text-sm text-gray-500">
+                            <strong>Request Body:</strong> ToolInvocationRequest (callId, arguments, context)
+                        </div>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-post">POST</span>
+                                <code class="text-lg font-mono">/tools/{toolName}/validate</code>
+                            </div>
+                            <i class="fas fa-check-circle text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Validate Tool Call</h4>
+                        <p class="text-gray-600 mb-3">Validates tool call parameters without executing the tool.</p>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/tools/{toolName}/stats</code>
+                            </div>
+                            <i class="fas fa-chart-bar text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Tool Execution Statistics</h4>
+                        <p class="text-gray-600 mb-3">Returns execution statistics for a specific tool.</p>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/tools/{toolName}/availability</code>
+                            </div>
+                            <i class="fas fa-heartbeat text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Check Tool Availability</h4>
+                        <p class="text-gray-600 mb-3">Checks if a tool is available and ready for execution.</p>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/stats</code>
+                            </div>
+                            <i class="fas fa-tachometer-alt text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">System Statistics</h4>
+                        <p class="text-gray-600 mb-3">Returns overall system execution statistics.</p>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/executions</code>
+                            </div>
+                            <i class="fas fa-tasks text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Active Tool Executions</h4>
+                        <p class="text-gray-600 mb-3">Returns currently active tool executions.</p>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-delete">DELETE</span>
+                                <code class="text-lg font-mono">/executions/{callId}</code>
+                            </div>
+                            <i class="fas fa-stop text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Cancel Tool Execution</h4>
+                        <p class="text-gray-600 mb-3">Cancels an active tool execution by call ID.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Streaming Endpoints -->
+            <div class="glass rounded-xl p-8 mb-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-stream text-green-600 mr-2"></i>Real-time Streaming Endpoints (SSE)
+                </h3>
+                <p class="text-gray-600 mb-6">Base path: <code class="bg-gray-100 px-2 py-1 rounded">/api/v1/mcp/stream</code></p>
+                
+                <div class="space-y-4">
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/system</code>
+                            </div>
+                            <i class="fas fa-broadcast-tower text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Stream System Events</h4>
+                        <p class="text-gray-600 mb-3">Real-time stream of system events including health status, statistics, and tool changes.</p>
+                        <div class="text-sm text-gray-500">
+                            <strong>Content-Type:</strong> text/event-stream
+                        </div>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/executions</code>
+                            </div>
+                            <i class="fas fa-stream text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Stream Execution Events</h4>
+                        <p class="text-gray-600 mb-3">Real-time stream of tool execution events and results.</p>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/executions/{callId}</code>
+                            </div>
+                            <i class="fas fa-eye text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Stream Specific Execution</h4>
+                        <p class="text-gray-600 mb-3">Real-time stream for a specific tool execution by call ID.</p>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/tools/availability</code>
+                            </div>
+                            <i class="fas fa-signal text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Stream Tool Availability</h4>
+                        <p class="text-gray-600 mb-3">Real-time stream of tool availability changes.</p>
+                    </div>
+
+                    <div class="endpoint-card glass rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="method-badge method-get">GET</span>
+                                <code class="text-lg font-mono">/health</code>
+                            </div>
+                            <i class="fas fa-heart text-gray-400"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Stream Health Status</h4>
+                        <p class="text-gray-600 mb-3">Real-time stream of system health status.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Management -->
+            <div class="glass rounded-xl p-8 mb-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-cog text-yellow-600 mr-2"></i>Configuration Management
+                </h3>
+                <p class="text-gray-600 mb-6">Base path: <code class="bg-gray-100 px-2 py-1 rounded">/api/v1/configurations</code></p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-post">POST</span>
+                            <code class="text-sm font-mono">/</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">Create API Configuration</h5>
+                    </div>
+                    
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-get">GET</span>
+                            <code class="text-sm font-mono">/</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">List All Configurations</h5>
+                    </div>
+                    
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-get">GET</span>
+                            <code class="text-sm font-mono">/{configId}</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">Get Specific Configuration</h5>
+                    </div>
+                    
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-put">PUT</span>
+                            <code class="text-sm font-mono">/{configId}</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">Update Configuration</h5>
+                    </div>
+                    
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-delete">DELETE</span>
+                            <code class="text-sm font-mono">/{configId}</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">Delete Configuration</h5>
+                    </div>
+                    
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-post">POST</span>
+                            <code class="text-sm font-mono">/{configId}/generate-tools</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">Generate Tools</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monitoring & Observability -->
+            <div class="glass rounded-xl p-8 mb-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-chart-line text-purple-600 mr-2"></i>Monitoring & Observability
+                </h3>
+                <p class="text-gray-600 mb-6">Base path: <code class="bg-gray-100 px-2 py-1 rounded">/api/v1/monitoring</code></p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-get">GET</span>
+                            <code class="text-sm font-mono">/metrics</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">System Metrics</h5>
+                    </div>
+                    
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-get">GET</span>
+                            <code class="text-sm font-mono">/health/detailed</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">Detailed Health Info</h5>
+                    </div>
+                    
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-get">GET</span>
+                            <code class="text-sm font-mono">/performance</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">Performance Statistics</h5>
+                    </div>
+                    
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-get">GET</span>
+                            <code class="text-sm font-mono">/audit</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">Audit Trail</h5>
+                    </div>
+                    
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-get">GET</span>
+                            <code class="text-sm font-mono">/diagnostics</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">System Diagnostics</h5>
+                    </div>
+                    
+                    <div class="endpoint-card glass rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="method-badge method-post">POST</span>
+                            <code class="text-sm font-mono">/health/check</code>
+                        </div>
+                        <h5 class="font-semibold text-gray-900 text-sm">Manual Health Check</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Usage -->
+            <div class="glass rounded-xl p-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-code text-indigo-600 mr-2"></i>Example Usage
+                </h3>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-3">1. List Available Tools</h4>
+                        <div class="code-block">
+curl -X GET "${window.location.origin}/api/v1/mcp/tools" \
+  -H "Accept: application/json"
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-3">2. Execute a Tool</h4>
+                        <div class="code-block">
+curl -X POST "${window.location.origin}/api/v1/mcp/tools/getUserById/invoke" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "callId": "unique-call-id-123",
+    "arguments": {
+      "id": "12345"
+    },
+    "context": {}
+  }'
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-3">3. Stream System Events</h4>
+                        <div class="code-block">
+curl -X GET "${window.location.origin}/api/v1/mcp/stream/system" \
+  -H "Accept: text/event-stream"
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        // Update all code blocks with dynamic URLs on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const baseUrl = window.location.origin;
+            const codeBlocks = document.querySelectorAll('.code-block');
+            
+            codeBlocks.forEach(block => {
+                block.innerHTML = block.innerHTML.replace(/\$\{window\.location\.origin\}/g, baseUrl);
+            });
+        });
+    </script>
+</body>
+</html>

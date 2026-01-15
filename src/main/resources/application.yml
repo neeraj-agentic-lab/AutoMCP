@@ -1,0 +1,112 @@
+server:
+  port: 8080
+
+# Management/Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  health:
+    db:
+      enabled: true
+
+spring:
+  application:
+    name: mcp-rest-adapter
+  
+  # R2DBC Reactive Database Configuration
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5434}/${DB_NAME:mcpwrapper}
+    username: ${DB_USERNAME:mcpuser}
+    password: ${DB_PASSWORD:mcppassword}
+    pool:
+      initial-size: ${DB_POOL_MIN_SIZE:5}
+      max-size: ${DB_POOL_MAX_SIZE:20}
+      max-idle-time: ${DB_POOL_MAX_IDLE_TIME:10m}
+      max-life-time: ${DB_POOL_MAX_LIFETIME:30m}
+      max-acquire-time: ${DB_POOL_MAX_ACQUIRE_TIME:30s}
+      max-create-connection-time: ${DB_POOL_MAX_CREATE_TIME:30s}
+      validation-query: SELECT 1
+  
+  # Legacy datasource for Flyway migrations
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5434}/${DB_NAME:mcpwrapper}
+    username: ${DB_USERNAME:mcpuser}
+    password: ${DB_PASSWORD:mcppassword}
+    driver-class-name: org.postgresql.Driver
+
+  # Security Configuration
+  security:
+    oauth2:
+      client:
+        registration:
+          # Default OAuth2 client for external API authentication
+          # Only configured when environment variables are provided
+          default:
+            client-id: ${MCP_OAUTH2_CLIENT_ID:dummy-client-id}
+            client-secret: ${MCP_OAUTH2_CLIENT_SECRET:dummy-client-secret}
+            authorization-grant-type: client_credentials
+            scope: ${MCP_OAUTH2_SCOPES:api:read,api:write}
+        provider:
+          default:
+            token-uri: ${MCP_OAUTH2_TOKEN_URI:http://localhost:8080/oauth/token}
+
+# =============================================================================
+# MCP ADAPTER CONFIGURATION
+# =============================================================================
+mcp:
+  # Server Configuration
+  server:
+    max-concurrent-executions: ${MCP_MAX_CONCURRENT_EXECUTIONS:50}
+    default-timeout: ${MCP_DEFAULT_TIMEOUT:PT30S}
+    enable-request-logging: ${MCP_ENABLE_REQUEST_LOGGING:false}
+  
+  # Tool Registry Configuration
+  registry:
+    cache-size: ${MCP_REGISTRY_CACHE_SIZE:1000}
+    cache-ttl: ${MCP_REGISTRY_CACHE_TTL:PT1H}
+    enable-metrics: ${MCP_REGISTRY_ENABLE_METRICS:true}
+  
+  # API Configuration (empty map for now)
+  apis: {}
+  
+  # Security Configuration
+  security:
+    auth-enabled: ${MCP_AUTH_ENABLED:true}
+    api-key-header: ${MCP_API_KEY_HEADER:X-API-Key}
+    cors:
+      enabled: ${MCP_CORS_ENABLED:true}
+      allowed-origins: 
+        - ${MCP_CORS_ORIGINS:*}
+      allowed-methods:
+        - GET
+        - POST
+        - OPTIONS
+      allowed-headers:
+        - ${MCP_CORS_HEADERS:*}
+      max-age: ${MCP_CORS_MAX_AGE:3600}
+  
+  # Circuit Breaker Configuration
+  circuit-breaker:
+    failure-rate-threshold: ${MCP_CB_FAILURE_RATE:50}
+    wait-duration-in-open-state: ${MCP_CB_WAIT_DURATION:PT30S}
+    sliding-window-size: ${MCP_CB_SLIDING_WINDOW:10}
+  
+  # Rate Limiting Configuration
+  rate-limit:
+    enabled: ${MCP_RATE_LIMIT_ENABLED:true}
+    default-limit: ${MCP_RATE_LIMIT_DEFAULT:1000}
+    window-duration: ${MCP_RATE_LIMIT_WINDOW:PT1M}
+    per-tool-limits: {}
+  
+  # Observability Configuration
+  observability:
+    metrics-enabled: ${MCP_METRICS_ENABLED:true}
+    tracing-enabled: ${MCP_TRACING_ENABLED:false}
+    health-checks-enabled: ${MCP_HEALTH_CHECKS_ENABLED:true}

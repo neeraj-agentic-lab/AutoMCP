@@ -1,0 +1,289 @@
+# MCP REST Adapter - Git Ignore Configuration
+# 
+# This file specifies which files and directories should be ignored by Git
+# to prevent sensitive information and build artifacts from being committed.
+# 
+# @author Neeraj Yadav
+
+# =============================================================================
+# JAVA / MAVEN
+# =============================================================================
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# =============================================================================
+# SPRING BOOT
+# =============================================================================
+
+# Spring Boot build info
+build-info.properties
+
+# Spring Boot DevTools
+.spring-boot-devtools.properties
+
+# =============================================================================
+# ENVIRONMENT & CONFIGURATION
+# =============================================================================
+
+# Environment variables (contains sensitive data)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Application properties with sensitive data
+application-local.yml
+application-local.properties
+application-secrets.yml
+application-secrets.properties
+
+# =============================================================================
+# DATABASE
+# =============================================================================
+
+# H2 Database files
+*.db
+*.mv.db
+*.trace.db
+data/
+
+# PostgreSQL dumps
+*.sql.gz
+*.dump
+
+# =============================================================================
+# DOCKER
+# =============================================================================
+
+# Docker volumes
+docker/volumes/
+docker/data/
+
+# Docker override files
+docker-compose.override.yml
+docker-compose.local.yml
+
+# =============================================================================
+# IDE CONFIGURATION
+# =============================================================================
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# =============================================================================
+# OPERATING SYSTEM
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# SECURITY & SECRETS
+# =============================================================================
+
+# API Keys and secrets
+secrets/
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+*.truststore
+
+# SSL Certificates
+*.crt
+*.cert
+*.ca-bundle
+
+# =============================================================================
+# LOGS & MONITORING
+# =============================================================================
+
+# Application logs
+logs/
+*.log.*
+*.out
+
+# Monitoring data
+prometheus/data/
+grafana/data/
+
+# =============================================================================
+# TESTING
+# =============================================================================
+
+# Test reports
+test-results/
+coverage/
+jacoco.exec
+*.lcov
+
+# =============================================================================
+# BUILD & DEPLOYMENT
+# =============================================================================
+
+# Build artifacts
+build/
+dist/
+*.tgz
+
+# Deployment scripts with secrets
+deploy-prod.sh
+deploy-staging.sh
+
+# Kubernetes secrets
+k8s/secrets/
+*.secret.yml
+
+# =============================================================================
+# FRONTEND (if added later)
+# =============================================================================
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# React build
+/build
+/public/hot
+/public/storage
+/storage/*.key
+
+# =============================================================================
+# BACKUP & TEMPORARY FILES
+# =============================================================================
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# PROJECT SPECIFIC
+# =============================================================================
+
+# OpenAPI specifications with sensitive data
+specs/private/
+specs/internal/
+
+# Configuration backups
+config-backup/
+*.config.backup
+
+# Tool definitions cache
+tool-cache/
+
+# User uploads
+uploads/
+user-files/

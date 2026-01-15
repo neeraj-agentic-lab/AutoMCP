@@ -1,0 +1,828 @@
+{
+	"info": {
+		"_postman_id": "mcp-rest-adapter-api",
+		"name": "MCP REST Adapter API",
+		"description": "Complete collection of MCP (Model Context Protocol) REST API endpoints for tool management, execution, configuration, monitoring, and real-time streaming.\n\nAuthor: Neeraj Yadav\nVersion: 1.0.0\nCreated: 2025-01-08",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "mcp-rest-adapter"
+	},
+	"item": [
+		{
+			"name": "Core MCP Protocol",
+			"description": "Core MCP protocol endpoints for tool management and execution",
+			"item": [
+				{
+					"name": "List All Tools",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/tools?namePattern=",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "tools"],
+							"query": [
+								{
+									"key": "namePattern",
+									"value": "",
+									"description": "Optional pattern to filter tools by name"
+								}
+							]
+						},
+						"description": "Returns a list of all MCP tools available for invocation with optional name pattern filtering."
+					}
+				},
+				{
+					"name": "Get Tool Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/tools/{{toolName}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "tools", "{{toolName}}"]
+						},
+						"description": "Returns detailed information about a specific tool including schema and metadata."
+					}
+				},
+				{
+					"name": "Execute Tool",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"callId\": \"unique-call-id-123\",\n  \"arguments\": {\n    \"id\": \"12345\"\n  },\n  \"context\": {}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/tools/{{toolName}}/invoke",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "tools", "{{toolName}}", "invoke"]
+						},
+						"description": "Executes a tool with the provided parameters and returns the result."
+					}
+				},
+				{
+					"name": "Validate Tool Call",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"callId\": \"validation-call-id\",\n  \"arguments\": {\n    \"id\": \"12345\"\n  },\n  \"context\": {}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/tools/{{toolName}}/validate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "tools", "{{toolName}}", "validate"]
+						},
+						"description": "Validates tool call parameters without executing the tool."
+					}
+				},
+				{
+					"name": "Get Tool Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/tools/{{toolName}}/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "tools", "{{toolName}}", "stats"]
+						},
+						"description": "Returns execution statistics for a specific tool."
+					}
+				},
+				{
+					"name": "Check Tool Availability",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/tools/{{toolName}}/availability",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "tools", "{{toolName}}", "availability"]
+						},
+						"description": "Checks if a tool is available and ready for execution."
+					}
+				},
+				{
+					"name": "Get System Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "stats"]
+						},
+						"description": "Returns overall system execution statistics."
+					}
+				},
+				{
+					"name": "Get Active Executions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/executions",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "executions"]
+						},
+						"description": "Returns currently active tool executions."
+					}
+				},
+				{
+					"name": "Cancel Tool Execution",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/executions/{{callId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "executions", "{{callId}}"]
+						},
+						"description": "Cancels an active tool execution by call ID."
+					}
+				}
+			]
+		},
+		{
+			"name": "Real-time Streaming (SSE)",
+			"description": "Server-Sent Events endpoints for real-time streaming",
+			"item": [
+				{
+					"name": "Stream System Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/event-stream"
+							},
+							{
+								"key": "Cache-Control",
+								"value": "no-cache"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/stream/system",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "stream", "system"]
+						},
+						"description": "Real-time stream of system events including health status, statistics, and tool changes."
+					}
+				},
+				{
+					"name": "Stream Execution Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/event-stream"
+							},
+							{
+								"key": "Cache-Control",
+								"value": "no-cache"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/stream/executions",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "stream", "executions"]
+						},
+						"description": "Real-time stream of tool execution events and results."
+					}
+				},
+				{
+					"name": "Stream Specific Execution",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/event-stream"
+							},
+							{
+								"key": "Cache-Control",
+								"value": "no-cache"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/stream/executions/{{callId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "stream", "executions", "{{callId}}"]
+						},
+						"description": "Real-time stream for a specific tool execution by call ID."
+					}
+				},
+				{
+					"name": "Stream Tool Availability",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/event-stream"
+							},
+							{
+								"key": "Cache-Control",
+								"value": "no-cache"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/stream/tools/availability",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "stream", "tools", "availability"]
+						},
+						"description": "Real-time stream of tool availability changes."
+					}
+				},
+				{
+					"name": "Stream Health Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/event-stream"
+							},
+							{
+								"key": "Cache-Control",
+								"value": "no-cache"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/mcp/stream/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "mcp", "stream", "health"]
+						},
+						"description": "Real-time stream of system health status."
+					}
+				}
+			]
+		},
+		{
+			"name": "Configuration Management",
+			"description": "API configuration management endpoints",
+			"item": [
+				{
+					"name": "Create API Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Sample API\",\n  \"description\": \"Sample API configuration\",\n  \"baseUrl\": \"https://api.example.com\",\n  \"openapiUrl\": \"https://api.example.com/openapi.json\",\n  \"timeoutSeconds\": 30,\n  \"rateLimitPerMinute\": 100,\n  \"enabled\": true,\n  \"authConfig\": {\n    \"type\": \"API_KEY\",\n    \"apiKeyHeader\": \"X-API-Key\",\n    \"apiKeyValue\": \"your-api-key\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations"]
+						},
+						"description": "Creates a new API configuration."
+					}
+				},
+				{
+					"name": "List All Configurations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations"]
+						},
+						"description": "Returns a list of all API configurations."
+					}
+				},
+				{
+					"name": "Get Configuration",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations/{{configId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations", "{{configId}}"]
+						},
+						"description": "Returns details of a specific API configuration."
+					}
+				},
+				{
+					"name": "Update Configuration",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated API\",\n  \"description\": \"Updated API configuration\",\n  \"baseUrl\": \"https://api.example.com\",\n  \"openapiUrl\": \"https://api.example.com/openapi.json\",\n  \"timeoutSeconds\": 60,\n  \"rateLimitPerMinute\": 200,\n  \"enabled\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations/{{configId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations", "{{configId}}"]
+						},
+						"description": "Updates an existing API configuration."
+					}
+				},
+				{
+					"name": "Delete Configuration",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations/{{configId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations", "{{configId}}"]
+						},
+						"description": "Deletes an API configuration."
+					}
+				},
+				{
+					"name": "Generate Tools from Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations/{{configId}}/generate-tools",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations", "{{configId}}", "generate-tools"]
+						},
+						"description": "Generates MCP tools from the API configuration's OpenAPI specification."
+					}
+				},
+				{
+					"name": "Refresh Tools for Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations/{{configId}}/refresh-tools",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations", "{{configId}}", "refresh-tools"]
+						},
+						"description": "Refreshes tools for a configuration by re-parsing the OpenAPI specification."
+					}
+				},
+				{
+					"name": "Test API Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations/{{configId}}/test",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations", "{{configId}}", "test"]
+						},
+						"description": "Tests the API configuration by attempting to connect and validate the OpenAPI specification."
+					}
+				},
+				{
+					"name": "Get Configuration Tools",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations/{{configId}}/tools",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations", "{{configId}}", "tools"]
+						},
+						"description": "Returns all tools generated from a specific configuration."
+					}
+				},
+				{
+					"name": "Validate Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"openapiUrl\": \"https://api.example.com/openapi.json\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations/{{configId}}/validate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations", "{{configId}}", "validate"]
+						},
+						"description": "Validates a configuration's OpenAPI specification."
+					}
+				},
+				{
+					"name": "Get Configuration Health",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/configurations/{{configId}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "configurations", "{{configId}}", "health"]
+						},
+						"description": "Returns health status of a specific configuration."
+					}
+				}
+			]
+		},
+		{
+			"name": "Monitoring & Observability",
+			"description": "System monitoring and observability endpoints",
+			"item": [
+				{
+					"name": "Get System Metrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/monitoring/metrics",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "monitoring", "metrics"]
+						},
+						"description": "Returns comprehensive system metrics and performance indicators."
+					}
+				},
+				{
+					"name": "Get Detailed Health Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/monitoring/health/detailed",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "monitoring", "health", "detailed"]
+						},
+						"description": "Returns comprehensive health information for all system components."
+					}
+				},
+				{
+					"name": "Get Performance Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/monitoring/performance?periodMinutes=60",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "monitoring", "performance"],
+							"query": [
+								{
+									"key": "periodMinutes",
+									"value": "60",
+									"description": "Time period in minutes (default: 60)"
+								}
+							]
+						},
+						"description": "Returns performance statistics for the specified time period."
+					}
+				},
+				{
+					"name": "Get Audit Trail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/monitoring/audit?hoursBack=24&eventType=",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "monitoring", "audit"],
+							"query": [
+								{
+									"key": "hoursBack",
+									"value": "24",
+									"description": "Hours to look back (default: 24)"
+								},
+								{
+									"key": "eventType",
+									"value": "",
+									"description": "Event type filter (optional)"
+								}
+							]
+						},
+						"description": "Returns recent audit events for compliance and debugging."
+					}
+				},
+				{
+					"name": "Get Configuration Audit Trail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/monitoring/audit/configuration/{{configId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "monitoring", "audit", "configuration", "{{configId}}"]
+						},
+						"description": "Returns audit trail for a specific configuration."
+					}
+				},
+				{
+					"name": "Get System Diagnostics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/monitoring/diagnostics",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "monitoring", "diagnostics"]
+						},
+						"description": "Returns detailed system diagnostics for troubleshooting."
+					}
+				},
+				{
+					"name": "Trigger Manual Health Check",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/monitoring/health/check",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "monitoring", "health", "check"]
+						},
+						"description": "Manually triggers a comprehensive health check."
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin Interface",
+			"description": "Admin interface endpoints",
+			"item": [
+				{
+					"name": "Admin Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/html"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", ""]
+						},
+						"description": "Access the admin dashboard interface."
+					}
+				},
+				{
+					"name": "Admin Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "status"]
+						},
+						"description": "Returns admin interface status."
+					}
+				},
+				{
+					"name": "Admin Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "stats"]
+						},
+						"description": "Returns configuration statistics for the admin interface."
+					}
+				},
+				{
+					"name": "Admin Test Endpoint",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/test",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "test"]
+						},
+						"description": "Test endpoint for admin interface functionality."
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"description": "Base URL for the MCP REST Adapter API. Change this to match your deployment environment."
+		},
+		{
+			"key": "toolName",
+			"value": "getUserById",
+			"description": "Sample tool name for testing tool-specific endpoints."
+		},
+		{
+			"key": "configId",
+			"value": "550e8400-e29b-41d4-a716-446655440000",
+			"description": "Sample configuration UUID for testing configuration endpoints."
+		},
+		{
+			"key": "callId",
+			"value": "execution-call-id-123",
+			"description": "Sample call ID for testing execution-related endpoints."
+		}
+	],
+	"auth": {
+		"type": "noauth"
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Pre-request script to set dynamic variables",
+					"// You can add authentication logic here if needed"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Test script to validate responses",
+					"pm.test(\"Status code is successful\", function () {",
+					"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
+					"});",
+					"",
+					"pm.test(\"Response time is less than 5000ms\", function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+					"});"
+				]
+			}
+		}
+	]
+}

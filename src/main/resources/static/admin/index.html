@@ -1,0 +1,2350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP REST Adapter - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-50: #eff6ff;
+            --primary-100: #dbeafe;
+            --primary-500: #3b82f6;
+            --primary-600: #2563eb;
+            --primary-700: #1d4ed8;
+            --primary-900: #1e3a8a;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --success-500: #10b981;
+            --warning-500: #f59e0b;
+            --error-500: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+            color: var(--gray-900);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .full-page-layout {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content-full {
+            flex: 1;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+        }
+        
+        .gradient-success {
+            background: linear-gradient(135deg, var(--success-500) 0%, #059669 100%);
+        }
+        
+        .gradient-warning {
+            background: linear-gradient(135deg, var(--warning-500) 0%, #d97706 100%);
+        }
+        
+        .gradient-error {
+            background: linear-gradient(135deg, var(--error-500) 0%, #dc2626 100%);
+        }
+        
+        .shadow-elegant {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .shadow-luxury {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .btn-luxury {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-luxury::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-luxury:hover::before {
+            left: 100%;
+        }
+        
+        .professional-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .professional-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div id="app">
+        <!-- Loading state -->
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="text-white text-xl">Loading...</div>
+        </div>
+    </div>
+
+    <!-- React and Babel for JSX -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Enhanced Header Component with Larger Fonts
+        const Header = ({ currentView, setCurrentView }) => (
+            <header className="glass shadow-luxury sticky top-0 z-50 animate-fade-in">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                    <div className="flex justify-between items-center py-4">
+                        <div className="flex items-center space-x-4">
+                            <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center shadow-elegant">
+                                <i className="fas fa-cogs text-lg text-white"></i>
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold text-gradient">MCP REST Adapter</h1>
+                                <p className="text-sm text-gray-600 font-medium">Professional API Management</p>
+                            </div>
+                        </div>
+                        <nav className="flex space-x-2">
+                            <button 
+                                onClick={() => setCurrentView('dashboard')}
+                                className={`px-5 py-2.5 rounded-lg font-semibold transition-all duration-300 btn-luxury text-base ${
+                                    currentView === 'dashboard' 
+                                        ? 'gradient-primary text-white shadow-elegant transform scale-105' 
+                                        : 'text-gray-700 hover:bg-gray-100 hover:shadow-md'
+                                }`}
+                            >
+                                <i className="fas fa-chart-line mr-2"></i>Dashboard
+                            </button>
+                            <button 
+                                onClick={() => window.location.href = '/admin/mcp-docs.html'}
+                                className="px-5 py-2.5 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 hover:shadow-md transition-all duration-300 btn-luxury text-base"
+                            >
+                                <i className="fas fa-book mr-2"></i>MCP Docs
+                            </button>
+                            <button 
+                                onClick={() => window.location.href = '/logout'}
+                                className="px-5 py-2.5 rounded-lg font-semibold text-gray-700 hover:bg-red-50 hover:text-red-600 hover:shadow-md transition-all duration-300 btn-luxury text-base"
+                            >
+                                <i className="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+        );
+
+        // Edit Form Component
+        const EditForm = ({ apiData, onUpdate, isUpdating }) => {
+            const [formData, setFormData] = useState({
+                id: apiData.id,
+                name: apiData.name || '',
+                description: apiData.description || '',
+                baseUrl: apiData.baseUrl || '',
+                openapiUrl: apiData.openapiUrl || '',
+                timeoutSeconds: apiData.timeoutSeconds || 30,
+                rateLimitPerMinute: apiData.rateLimitPerMinute || 100,
+                enabled: apiData.enabled !== undefined ? apiData.enabled : true
+            });
+
+            const handleChange = (e) => {
+                const { name, value, type, checked } = e.target;
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: type === 'checkbox' ? checked : (type === 'number' ? parseInt(value) : value)
+                }));
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onUpdate(formData);
+            };
+
+            return (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label className="block text-lg font-semibold text-gray-700 mb-3">
+                            <i className="fas fa-tag mr-3 text-blue-600"></i>API Name *
+                        </label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-lg font-medium shadow-sm hover:shadow-md"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-lg font-semibold text-gray-700 mb-3">
+                            <i className="fas fa-link mr-3 text-green-600"></i>Base URL *
+                        </label>
+                        <input
+                            type="url"
+                            name="baseUrl"
+                            value={formData.baseUrl}
+                            onChange={handleChange}
+                            className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-lg font-medium shadow-sm hover:shadow-md"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-lg font-semibold text-gray-700 mb-3">
+                            <i className="fas fa-file-code mr-3 text-purple-600"></i>OpenAPI Specification URL *
+                        </label>
+                        <input
+                            type="url"
+                            name="openapiUrl"
+                            value={formData.openapiUrl}
+                            onChange={handleChange}
+                            className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-lg font-medium shadow-sm hover:shadow-md"
+                            required
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <i className="fas fa-clock mr-2"></i>Timeout (seconds)
+                            </label>
+                            <input
+                                type="number"
+                                name="timeoutSeconds"
+                                value={formData.timeoutSeconds}
+                                onChange={handleChange}
+                                min="1"
+                                max="300"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <i className="fas fa-tachometer-alt mr-2"></i>Rate Limit (req/min)
+                            </label>
+                            <input
+                                type="number"
+                                name="rateLimitPerMinute"
+                                value={formData.rateLimitPerMinute}
+                                onChange={handleChange}
+                                min="1"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-lg font-semibold text-gray-700 mb-3">
+                            <i className="fas fa-align-left mr-3 text-orange-600"></i>Description
+                        </label>
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            rows="4"
+                            className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-lg font-medium shadow-sm hover:shadow-md resize-vertical"
+                            placeholder="Provide a detailed description of what this API does..."
+                        />
+                    </div>
+
+                    <div className="flex items-center space-x-3 p-4 bg-gray-50 bg-opacity-50 rounded-lg">
+                        <input
+                            type="checkbox"
+                            name="enabled"
+                            checked={formData.enabled}
+                            onChange={handleChange}
+                            className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        />
+                        <label className="text-sm font-medium text-gray-700">
+                            <i className="fas fa-power-off mr-2"></i>Enable API
+                        </label>
+                    </div>
+
+                    <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                        <button
+                            type="submit"
+                            disabled={isUpdating}
+                            className={`px-8 py-4 rounded-xl transition-all duration-300 font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-105 ${
+                                isUpdating
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'gradient-primary text-white hover:from-blue-700 hover:to-blue-800'
+                            }`}
+                        >
+                            {isUpdating ? (
+                                <>
+                                    <i className="fas fa-spinner fa-spin mr-2"></i>Updating...
+                                </>
+                            ) : (
+                                <>
+                                    <i className="fas fa-save mr-2"></i>Update Configuration
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </form>
+            );
+        };
+
+        // API Details Page Component
+        const APIDetailsPage = ({ apiId, setCurrentView }) => {
+            const [apiData, setApiData] = useState(null);
+            const [tools, setTools] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [editMode, setEditMode] = useState(false);
+            const [testResults, setTestResults] = useState({});
+            const [toolsLoading, setToolsLoading] = useState(false);
+            const [deleteState, setDeleteState] = useState({
+                showConfirmModal: false,
+                isDeleting: false,
+                error: null
+            });
+
+            useEffect(() => {
+                fetchApiDetails();
+                fetchApiTools();
+            }, [apiId]);
+
+            const fetchApiDetails = async () => {
+                try {
+                    const response = await fetch(`/api/v1/configurations/${apiId}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        setApiData(data);
+                    }
+                } catch (error) {
+                    console.error('Error fetching API details:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const fetchApiTools = async () => {
+                console.log('=== FETCHING TOOLS ===');
+                console.log('API ID to filter by:', apiId);
+                console.log('API ID type:', typeof apiId);
+                
+                setToolsLoading(true);
+                try {
+                    // Get all tools from MCP endpoint and filter by API config ID
+                    const response = await fetch('/api/v1/mcp/tools');
+                    console.log('MCP tools endpoint response status:', response.status);
+                    
+                    if (response.ok) {
+                        const allTools = await response.json();
+                        console.log('Total tools received:', allTools.length);
+                        console.log('All tools:', allTools);
+                        
+                        // Filter tools that belong to this API configuration
+                        const apiTools = allTools.filter(tool => {
+                            const metadata = tool.metadata || {};
+                            const toolApiConfigId = metadata.apiConfigId;
+                            
+                            console.log('=== TOOL FILTERING ===');
+                            console.log('Tool name:', tool.name);
+                            console.log('Tool metadata:', metadata);
+                            console.log('Tool apiConfigId:', toolApiConfigId);
+                            console.log('Tool apiConfigId type:', typeof toolApiConfigId);
+                            console.log('Target apiId:', apiId);
+                            console.log('Target apiId type:', typeof apiId);
+                            console.log('Match (===):', toolApiConfigId === apiId);
+                            console.log('Match (==):', toolApiConfigId == apiId);
+                            console.log('String match:', String(toolApiConfigId) === String(apiId));
+                            
+                            // Try multiple comparison methods
+                            return toolApiConfigId === apiId || 
+                                   toolApiConfigId == apiId || 
+                                   String(toolApiConfigId) === String(apiId);
+                        });
+                        
+                        console.log('Filtered tools for API:', apiTools.length, 'tools');
+                        console.log('Filtered tools details:', apiTools);
+                        setTools(apiTools);
+                    } else {
+                        console.log('MCP tools endpoint failed with status:', response.status);
+                        setTools([]);
+                    }
+                } catch (error) {
+                    console.error('Error fetching API tools:', error);
+                    setTools([]);
+                } finally {
+                    console.log('=== FETCHING TOOLS FINISHED ===');
+                    setToolsLoading(false);
+                }
+            };
+
+            const generateTools = async () => {
+                console.log('=== GENERATE TOOLS STARTED ===');
+                console.log('API ID:', apiId);
+                console.log('Generate Tools URL:', `/api/v1/configurations/${apiId}/generate-tools`);
+                
+                setToolsLoading(true);
+                try {
+                    const response = await fetch(`/api/v1/configurations/${apiId}/generate-tools`, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    console.log('Generate tools response status:', response.status);
+                    console.log('Generate tools response headers:', [...response.headers.entries()]);
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Tools generation SUCCESS:', result);
+                        console.log('Number of tools generated:', result.toolCount || 'unknown');
+                        
+                        // Show success message
+                        alert(`Success! Generated ${result.toolCount || 0} tools for ${result.apiTitle || 'API'}`);
+                        
+                        // Refresh tools after generation
+                        await fetchApiTools();
+                    } else {
+                        const errorText = await response.text();
+                        console.error('Generate tools FAILED:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            body: errorText
+                        });
+                        
+                        // Show error message
+                        alert(`Failed to generate tools: ${response.status} ${response.statusText}\n\nDetails: ${errorText}`);
+                    }
+                } catch (error) {
+                    console.error('Generate tools ERROR:', error);
+                    alert(`Network error while generating tools: ${error.message}`);
+                } finally {
+                    console.log('=== GENERATE TOOLS FINISHED ===');
+                    setToolsLoading(false);
+                }
+            };
+
+            const showAllTools = async () => {
+                console.log('=== SHOWING ALL TOOLS (DEBUG) ===');
+                try {
+                    const response = await fetch('/api/v1/mcp/tools');
+                    console.log('MCP tools response status:', response.status);
+                    console.log('MCP tools response headers:', [...response.headers.entries()]);
+                    
+                    if (response.ok) {
+                        const allTools = await response.json();
+                        console.log('ALL TOOLS IN SYSTEM:', allTools);
+                        console.log('Tools array length:', allTools.length);
+                        
+                        if (allTools.length === 0) {
+                            alert('No tools found in MCP registry. This suggests tools are being generated but not properly registered. Check backend logs for registration errors.');
+                        } else {
+                            alert(`Found ${allTools.length} total tools in system. Check console for details.`);
+                        }
+                    } else {
+                        const errorText = await response.text();
+                        console.error('MCP tools endpoint failed:', response.status, errorText);
+                        alert(`Failed to fetch tools: ${response.status} ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error('Error fetching all tools:', error);
+                    alert(`Network error: ${error.message}`);
+                }
+            };
+
+            const refreshTools = async () => {
+                console.log('=== REFRESH TOOLS STARTED ===');
+                console.log('API ID:', apiId);
+                console.log('Refresh Tools URL:', `/api/v1/configurations/${apiId}/refresh-tools`);
+                
+                setToolsLoading(true);
+                try {
+                    const response = await fetch(`/api/v1/configurations/${apiId}/refresh-tools`, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    console.log('Refresh tools response status:', response.status);
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Tools refresh SUCCESS:', result);
+                        
+                        alert(`Success! Refreshed ${result.toolCount || 0} tools`);
+                        
+                        // Refresh tools after generation
+                        await fetchApiTools();
+                    } else {
+                        const errorText = await response.text();
+                        console.error('Refresh tools FAILED:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            body: errorText
+                        });
+                        
+                        alert(`Failed to refresh tools: ${response.status} ${response.statusText}\n\nDetails: ${errorText}`);
+                    }
+                } catch (error) {
+                    console.error('Refresh tools ERROR:', error);
+                    alert(`Network error while refreshing tools: ${error.message}`);
+                } finally {
+                    console.log('=== REFRESH TOOLS FINISHED ===');
+                    setToolsLoading(false);
+                }
+            };
+
+            const testToolRegistration = async () => {
+                console.log('=== TESTING TOOL REGISTRATION ===');
+                try {
+                    // Test 1: Try to generate tools and see detailed logs
+                    console.log('Step 1: Testing tool generation...');
+                    let response = await fetch(`/api/v1/configurations/${apiId}/generate-tools`, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    console.log('Generate tools response status:', response.status);
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Generate tools SUCCESS:', result);
+                        
+                        // Step 2: Immediately check if tools appear in registry
+                        console.log('Step 2: Checking MCP registry...');
+                        response = await fetch('/api/v1/mcp/tools');
+                        
+                        if (response.ok) {
+                            const allTools = await response.json();
+                            console.log('MCP registry tools:', allTools);
+                            
+                            if (allTools.length > 0) {
+                                alert(`SUCCESS! Found ${allTools.length} tools in MCP registry after generation.\n\nThe registration is working!`);
+                            } else {
+                                alert(`ISSUE IDENTIFIED: Tools generated (${result.toolCount || 0}) but not appearing in MCP registry.\n\nThis indicates a database persistence issue.`);
+                                
+                                // Step 3: Check backend logs suggestion
+                                console.log('Step 3: Check backend logs for errors during tool registration');
+                                console.log('Look for errors in ReactiveToolRegistryService.registerTool()');
+                            }
+                        }
+                    } else {
+                        const errorText = await response.text();
+                        console.error('Generate tools FAILED:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            body: errorText
+                        });
+                        alert(`Tool generation failed: ${response.status} ${response.statusText}\n\nDetails: ${errorText}`);
+                    }
+                } catch (error) {
+                    console.error('Tool registration test ERROR:', error);
+                    alert(`Network error during tool registration test: ${error.message}`);
+                }
+            };
+
+            const checkDatabaseHealth = async () => {
+                console.log('=== CHECKING DATABASE HEALTH ===');
+                try {
+                    // Try actuator health endpoint first
+                    let response = await fetch('/actuator/health', {
+                        credentials: 'same-origin'
+                    });
+                    
+                    console.log('Health check response status:', response.status);
+                    
+                    if (response.ok) {
+                        const health = await response.json();
+                        console.log('Application health:', health);
+                        
+                        const dbStatus = health.components?.db?.status || health.status || 'unknown';
+                        const dbDetails = health.components?.db?.details || {};
+                        
+                        alert(`Database Status: ${dbStatus}\n\nDetails: ${JSON.stringify(dbDetails, null, 2)}`);
+                        return;
+                    }
+                    
+                    // If actuator not available, try a simple API call to test database
+                    console.log('Actuator not available, trying simple database test...');
+                    response = await fetch('/api/v1/configurations', {
+                        credentials: 'same-origin'
+                    });
+                    
+                    console.log('Database test via API response status:', response.status);
+                    
+                    if (response.ok) {
+                        alert('Database appears to be working (API call successful)\n\nNote: Restart the application to enable detailed health checks.');
+                    } else {
+                        const errorText = await response.text();
+                        alert(`Database test failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`);
+                    }
+                    
+                } catch (error) {
+                    console.error('Health check error:', error);
+                    alert(`Health check failed: ${error.message}\n\nThis could indicate database connectivity issues.`);
+                }
+            };
+
+            const testApiConnection = async () => {
+                setTestResults(prev => ({ ...prev, api: { testing: true } }));
+                try {
+                    const response = await fetch(`/api/v1/configurations/${apiId}/test`);
+                    const result = await response.json();
+                    setTestResults(prev => ({ 
+                        ...prev, 
+                        api: { 
+                            testing: false, 
+                            success: response.ok, 
+                            result: result,
+                            timestamp: new Date().toLocaleString()
+                        } 
+                    }));
+                } catch (error) {
+                    setTestResults(prev => ({ 
+                        ...prev, 
+                        api: { 
+                            testing: false, 
+                            success: false, 
+                            error: error.message,
+                            timestamp: new Date().toLocaleString()
+                        } 
+                    }));
+                }
+            };
+
+            const testTool = async (toolId, toolName) => {
+                setTestResults(prev => ({ 
+                    ...prev, 
+                    [toolId]: { testing: true } 
+                }));
+                try {
+                    const response = await fetch(`/api/v1/tools/${toolId}/test`);
+                    const result = await response.json();
+                    setTestResults(prev => ({ 
+                        ...prev, 
+                        [toolId]: { 
+                            testing: false, 
+                            success: response.ok, 
+                            result: result,
+                            timestamp: new Date().toLocaleString()
+                        } 
+                    }));
+                } catch (error) {
+                    setTestResults(prev => ({ 
+                        ...prev, 
+                        [toolId]: { 
+                            testing: false, 
+                            success: false, 
+                            error: error.message,
+                            timestamp: new Date().toLocaleString()
+                        } 
+                    }));
+                }
+            };
+
+            const handleDelete = async () => {
+                setDeleteState(prev => ({ ...prev, isDeleting: true, error: null }));
+                try {
+                    const response = await fetch(`/api/v1/configurations/${apiId}?deletedBy=admin`, {
+                        method: 'DELETE',
+                        credentials: 'same-origin'
+                    });
+
+                    if (response.ok) {
+                        setCurrentView('dashboard');
+                    } else {
+                        setDeleteState(prev => ({
+                            ...prev,
+                            isDeleting: false,
+                            error: `Failed to delete API: ${response.status} ${response.statusText}`
+                        }));
+                    }
+                } catch (error) {
+                    setDeleteState(prev => ({
+                        ...prev,
+                        isDeleting: false,
+                        error: `Network error: ${error.message}`
+                    }));
+                }
+            };
+
+            if (loading) {
+                return (
+                    <div className="w-full px-6 py-4 animate-slide-up">
+                        <div className="flex items-center justify-center h-64">
+                            <i className="fas fa-spinner fa-spin text-4xl text-blue-600"></i>
+                            <span className="ml-4 text-xl text-gray-600">Loading API details...</span>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (!apiData) {
+                return (
+                    <div className="w-full px-6 py-4 animate-slide-up">
+                        <div className="text-center py-12">
+                            <i className="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                            <h4 className="text-lg font-semibold text-gray-600 mb-2">API Not Found</h4>
+                            <p className="text-gray-500 mb-6">The requested API configuration could not be found.</p>
+                            <button 
+                                onClick={() => setCurrentView('dashboard')}
+                                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                <i className="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="w-full px-6 py-4 animate-slide-up">
+                    {/* Header */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <button 
+                                    onClick={() => setCurrentView('dashboard')}
+                                    className="mr-4 p-2 text-gray-600 hover:text-blue-600 transition-colors"
+                                >
+                                    <i className="fas fa-arrow-left text-xl"></i>
+                                </button>
+                                <div>
+                                    <h1 className="text-3xl font-bold text-white">{apiData.name}</h1>
+                                    <p className="text-white text-opacity-70 font-mono text-sm">{apiData.id}</p>
+                                </div>
+                            </div>
+                            <div className="flex space-x-3">
+                                <button 
+                                    onClick={() => setEditMode(!editMode)}
+                                    className={`px-4 py-2 rounded-lg transition-colors font-semibold ${
+                                        editMode 
+                                            ? 'bg-gray-600 text-white' 
+                                            : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                                    }`}
+                                >
+                                    <i className={`fas ${editMode ? 'fa-eye' : 'fa-edit'} mr-2`}></i>
+                                    {editMode ? 'View Mode' : 'Edit Mode'}
+                                </button>
+                                <button 
+                                    onClick={() => setDeleteState(prev => ({ ...prev, showConfirmModal: true }))}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
+                                >
+                                    <i className="fas fa-trash mr-2"></i>Delete API
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Delete Confirmation Modal */}
+                    {deleteState.showConfirmModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+                            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 animate-slide-up">
+                                <div className="p-6">
+                                    <div className="flex items-center mb-4">
+                                        <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                                            <i className="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-bold text-gray-900">Confirm Deletion</h3>
+                                            <p className="text-gray-600">This action cannot be undone</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="mb-6">
+                                        <p className="text-gray-700">
+                                            Are you sure you want to delete the API configuration 
+                                            <span className="font-semibold text-gray-900"> "{apiData.name}"</span>?
+                                        </p>
+                                        <p className="text-sm text-gray-500 mt-2">
+                                            This will permanently remove the API configuration and all associated tools.
+                                        </p>
+                                    </div>
+
+                                    {deleteState.error && (
+                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                            <p className="text-red-700 text-sm">{deleteState.error}</p>
+                                        </div>
+                                    )}
+                                    
+                                    <div className="flex space-x-3 justify-end">
+                                        <button
+                                            onClick={() => setDeleteState(prev => ({ ...prev, showConfirmModal: false, error: null }))}
+                                            disabled={deleteState.isDeleting}
+                                            className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
+                                        >
+                                            <i className="fas fa-times mr-2"></i>Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleDelete}
+                                            disabled={deleteState.isDeleting}
+                                            className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md"
+                                        >
+                                            {deleteState.isDeleting ? (
+                                                <>
+                                                    <i className="fas fa-spinner fa-spin mr-2"></i>Deleting...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="fas fa-trash mr-2"></i>Delete API
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Main Content */}
+                    <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+                        {/* Configuration Panel */}
+                        <div className="xl:col-span-3">
+                            <div className="professional-card p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-2xl font-bold text-gray-900">
+                                        <i className="fas fa-cog mr-3 text-blue-600"></i>Configuration
+                                    </h2>
+                                    <button 
+                                        onClick={testApiConnection}
+                                        disabled={testResults.api?.testing}
+                                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                                    >
+                                        {testResults.api?.testing ? (
+                                            <>
+                                                <i className="fas fa-spinner fa-spin mr-2"></i>Testing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="fas fa-play mr-2"></i>Test API
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+
+                                {editMode ? (
+                                    <EditForm 
+                                        apiData={apiData} 
+                                        onUpdate={(updatedData) => {
+                                            setApiData(updatedData);
+                                            setEditMode(false);
+                                        }} 
+                                        isUpdating={false}
+                                    />
+                                ) : (
+                                    <div className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Base URL</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{apiData.baseUrl}</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                                                    apiData.enabled 
+                                                        ? 'bg-green-100 text-green-800' 
+                                                        : 'bg-red-100 text-red-800'
+                                                }`}>
+                                                    {apiData.enabled ? 'Active' : 'Inactive'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">OpenAPI Specification URL</label>
+                                            <p className="text-gray-900 bg-gray-50 p-3 rounded-lg break-all">{apiData.openapiUrl}</p>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Timeout (seconds)</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{apiData.timeoutSeconds}</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Rate Limit (req/min)</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{apiData.rateLimitPerMinute}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        {apiData.description && (
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{apiData.description}</p>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Created</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
+                                                    {apiData.createdAt ? new Date(apiData.createdAt).toLocaleString() : 'N/A'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Last Updated</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
+                                                    {apiData.updatedAt ? new Date(apiData.updatedAt).toLocaleString() : 'N/A'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* API Test Results */}
+                                {testResults.api && !testResults.api.testing && (
+                                    <div className="mt-6 p-4 border rounded-lg">
+                                        <h3 className="font-semibold mb-2">
+                                            <i className={`fas ${testResults.api.success ? 'fa-check-circle text-green-600' : 'fa-exclamation-circle text-red-600'} mr-2`}></i>
+                                            API Test Results
+                                        </h3>
+                                        <p className="text-sm text-gray-600 mb-2">Tested at: {testResults.api.timestamp}</p>
+                                        {testResults.api.success ? (
+                                            <div className="text-green-700 bg-green-50 p-3 rounded">
+                                                <i className="fas fa-check mr-2"></i>API connection successful
+                                            </div>
+                                        ) : (
+                                            <div className="text-red-700 bg-red-50 p-3 rounded">
+                                                <i className="fas fa-times mr-2"></i>
+                                                {testResults.api.error || 'API connection failed'}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Tools Panel */}
+                        <div className="xl:col-span-2">
+                            <div className="professional-card p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-2xl font-bold text-gray-900">
+                                        <i className="fas fa-tools mr-3 text-purple-600"></i>MCP Tools
+                                        <span className="ml-2 text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
+                                            {tools.length}
+                                        </span>
+                                    </h2>
+                                    <div className="flex space-x-1">
+                                        <button 
+                                            onClick={fetchApiTools}
+                                            disabled={toolsLoading}
+                                            className={`px-3 py-2 rounded-lg transition-colors font-semibold ${
+                                                toolsLoading 
+                                                    ? 'bg-gray-400 cursor-not-allowed' 
+                                                    : 'bg-purple-600 hover:bg-purple-700'
+                                            } text-white text-sm`}
+                                        >
+                                            {toolsLoading ? (
+                                                <>
+                                                    <i className="fas fa-spinner fa-spin mr-1"></i>Refreshing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="fas fa-sync-alt mr-1"></i>Refresh
+                                                </>
+                                            )}
+                                        </button>
+                                        <button 
+                                            onClick={testToolRegistration}
+                                            className="px-2 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                                        >
+                                            <i className="fas fa-flask mr-1"></i>Test
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {toolsLoading ? (
+                                    <div className="text-center py-8">
+                                        <i className="fas fa-spinner fa-spin text-3xl text-purple-600 mb-3"></i>
+                                        <p className="text-gray-600">Loading tools...</p>
+                                        <p className="text-sm text-gray-400">Please wait while we fetch the latest tools</p>
+                                    </div>
+                                ) : tools.length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <i className="fas fa-tools text-3xl text-gray-400 mb-3"></i>
+                                        <p className="text-gray-500">No tools available</p>
+                                        <p className="text-sm text-gray-400">Generate tools from your API specification</p>
+                                        <div className="mt-4 mb-4">
+                                            <button 
+                                                onClick={testToolRegistration}
+                                                className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold text-lg"
+                                            >
+                                                <i className="fas fa-flask mr-2"></i>🧪 TEST TOOL REGISTRATION 🧪
+                                            </button>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 mt-4">
+                                            <button 
+                                                onClick={generateTools}
+                                                disabled={toolsLoading}
+                                                className={`px-4 py-2 rounded-lg transition-colors text-white ${
+                                                    toolsLoading 
+                                                        ? 'bg-gray-400 cursor-not-allowed' 
+                                                        : 'bg-green-600 hover:bg-green-700'
+                                                }`}
+                                            >
+                                                {toolsLoading ? (
+                                                    <>
+                                                        <i className="fas fa-spinner fa-spin mr-2"></i>Working...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <i className="fas fa-magic mr-2"></i>Generate
+                                                    </>
+                                                )}
+                                            </button>
+                                            <button 
+                                                onClick={refreshTools}
+                                                disabled={toolsLoading}
+                                                className={`px-4 py-2 rounded-lg transition-colors text-white ${
+                                                    toolsLoading 
+                                                        ? 'bg-gray-400 cursor-not-allowed' 
+                                                        : 'bg-blue-600 hover:bg-blue-700'
+                                                }`}
+                                            >
+                                                {toolsLoading ? (
+                                                    <>
+                                                        <i className="fas fa-spinner fa-spin mr-2"></i>Working...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <i className="fas fa-redo mr-2"></i>Refresh Tools
+                                                    </>
+                                                )}
+                                            </button>
+                                            <button 
+                                                onClick={testToolRegistration}
+                                                className="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                                            >
+                                                <i className="fas fa-flask mr-1"></i>Test Registration
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {tools.map((tool, index) => (
+                                            <div key={index} className="border border-gray-200 rounded-lg p-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="font-semibold text-gray-900">{tool.name}</h3>
+                                                    <button 
+                                                        onClick={() => testTool(tool.id, tool.name)}
+                                                        disabled={testResults[tool.id]?.testing}
+                                                        className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                                                    >
+                                                        {testResults[tool.id]?.testing ? (
+                                                            <>
+                                                                <i className="fas fa-spinner fa-spin mr-1"></i>Testing
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <i className="fas fa-play mr-1"></i>Test
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                                <div className="flex items-start justify-between gap-4">
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="text-xs text-gray-500 mb-1">
+                                                            {tool.metadata?.apiTitle || 'Unknown API'}
+                                                        </div>
+                                                        <p className="text-sm text-gray-600 mb-2 whitespace-pre-line">{(tool.description || 'No description available').split('\n\nEndpoint:')[0].trim()}</p>
+                                                        <div className="flex items-center gap-2 text-xs">
+                                                            <span className={`px-2 py-1 rounded font-semibold border ${
+                                                                (tool.metadata?.httpMethod || 'GET').toUpperCase() === 'GET'
+                                                                    ? 'bg-green-50 text-green-700 border-green-200'
+                                                                    : (tool.metadata?.httpMethod || '').toUpperCase() === 'POST'
+                                                                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                                                        : (tool.metadata?.httpMethod || '').toUpperCase() === 'PUT'
+                                                                            ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                                                                            : (tool.metadata?.httpMethod || '').toUpperCase() === 'DELETE'
+                                                                                ? 'bg-red-50 text-red-700 border-red-200'
+                                                                                : 'bg-gray-50 text-gray-700 border-gray-200'
+                                                            }`}
+                                                            >
+                                                                {(tool.metadata?.httpMethod || 'GET').toUpperCase()}
+                                                            </span>
+                                                            <span className="font-mono text-gray-700 break-all">
+                                                                {tool.metadata?.endpointPath || '—'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* Tool Test Results */}
+                                                {testResults[tool.id] && !testResults[tool.id].testing && (
+                                                    <div className="mt-3 p-2 border rounded text-xs">
+                                                        <div className={`flex items-center ${testResults[tool.id].success ? 'text-green-600' : 'text-red-600'}`}>
+                                                            <i className={`fas ${testResults[tool.id].success ? 'fa-check' : 'fa-times'} mr-1`}></i>
+                                                            {testResults[tool.id].success ? 'Test passed' : 'Test failed'}
+                                                            <span className="ml-auto text-gray-500">{testResults[tool.id].timestamp}</span>
+                                                        </div>
+                                                        {testResults[tool.id].error && (
+                                                            <div className="mt-1 text-red-600">{testResults[tool.id].error}</div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Dashboard Component
+        const Dashboard = ({ setCurrentView }) => {
+            const [apis, setApis] = useState([]);
+            const [isRefreshing, setIsRefreshing] = useState(false);
+            const [stats, setStats] = useState({
+                totalApis: 0,
+                activeApis: 0,
+                totalTools: 0,
+                failedTests: 0
+            });
+            const [deleteState, setDeleteState] = useState({
+                isDeleting: false,
+                deletingId: null,
+                error: null,
+                success: false,
+                showConfirmModal: false,
+                apiToDelete: null
+            });
+            const [viewState, setViewState] = useState({
+                showViewModal: false,
+                apiToView: null
+            });
+            const [editState, setEditState] = useState({
+                showEditModal: false,
+                apiToEdit: null,
+                isUpdating: false,
+                error: null,
+                success: false
+            });
+
+            useEffect(() => {
+                // Fetch APIs and stats
+                fetchApis();
+                fetchStats();
+            }, []);
+
+            const fetchApis = async () => {
+                try {
+                    // Fetch both APIs and tools in parallel
+                    const [apisResponse, toolsResponse] = await Promise.all([
+                        fetch('/api/v1/configurations'),
+                        fetch('/api/v1/mcp/tools')
+                    ]);
+                    const apisData = await apisResponse.json();
+                    const toolsData = await toolsResponse.json();
+                    
+                    // Count tools per API config
+                    const toolCounts = {};
+                    (toolsData || []).forEach(tool => {
+                        const configId = tool.metadata?.apiConfigId;
+                        if (configId) {
+                            toolCounts[configId] = (toolCounts[configId] || 0) + 1;
+                        }
+                    });
+                    
+                    // Merge tool counts with APIs
+                    const apisWithToolCounts = (apisData || []).map(api => ({
+                        ...api,
+                        toolCount: toolCounts[api.id] || 0
+                    }));
+                    
+                    setApis(apisWithToolCounts);
+                } catch (error) {
+                    console.error('Error fetching APIs:', error);
+                }
+            };
+
+            const fetchStats = async () => {
+                try {
+                    const response = await fetch('/admin/stats');
+                    const data = await response.json();
+                    
+                    // Map backend response to frontend stats structure
+                    setStats({
+                        totalApis: data.totalConfigurations || 0,
+                        activeApis: data.enabledConfigurations || 0,
+                        totalTools: data.totalTools || 0,
+                        failedTests: 0 // This would need to be calculated from API health checks
+                    });
+                } catch (error) {
+                    console.error('Error fetching stats:', error);
+                    // Set default values on error
+                    setStats({
+                        totalApis: 0,
+                        activeApis: 0,
+                        totalTools: 0,
+                        failedTests: 0
+                    });
+                }
+            };
+
+            const showDeleteConfirmation = (apiId, apiName) => {
+                setDeleteState(prev => ({
+                    ...prev,
+                    showConfirmModal: true,
+                    apiToDelete: { id: apiId, name: apiName }
+                }));
+            };
+
+            const cancelDelete = () => {
+                setDeleteState(prev => ({
+                    ...prev,
+                    showConfirmModal: false,
+                    apiToDelete: null
+                }));
+            };
+
+            const confirmDelete = async () => {
+                const { apiToDelete } = deleteState;
+                if (!apiToDelete) return;
+
+                setDeleteState(prev => ({ 
+                    ...prev, 
+                    isDeleting: true, 
+                    deletingId: apiToDelete.id, 
+                    showConfirmModal: false,
+                    error: null, 
+                    success: false 
+                }));
+
+                try {
+                    const response = await fetch(`/api/v1/configurations/${apiToDelete.id}?deletedBy=admin`, {
+                        method: 'DELETE',
+                        credentials: 'same-origin'
+                    });
+
+                    if (response.ok) {
+                        setDeleteState(prev => ({ 
+                            ...prev,
+                            isDeleting: false, 
+                            deletingId: null, 
+                            apiToDelete: null,
+                            error: null, 
+                            success: true 
+                        }));
+                        // Refresh the API list and stats
+                        await fetchApis();
+                        await fetchStats();
+                        
+                        // Clear success message after 3 seconds
+                        setTimeout(() => {
+                            setDeleteState(prev => ({ ...prev, success: false }));
+                        }, 3000);
+                    } else {
+                        const errorData = await response.text();
+                        setDeleteState(prev => ({ 
+                            ...prev,
+                            isDeleting: false, 
+                            deletingId: null, 
+                            apiToDelete: null,
+                            error: `Failed to delete API: ${response.status} ${response.statusText}`, 
+                            success: false 
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    setDeleteState(prev => ({ 
+                        ...prev,
+                        isDeleting: false, 
+                        deletingId: null, 
+                        apiToDelete: null,
+                        error: `Network error: ${error.message}`, 
+                        success: false 
+                    }));
+                }
+            };
+
+            const showViewModal = async (apiId) => {
+                try {
+                    const response = await fetch(`/api/v1/configurations/${apiId}`);
+                    if (response.ok) {
+                        const apiData = await response.json();
+                        setViewState({
+                            showViewModal: true,
+                            apiToView: apiData
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching API details:', error);
+                }
+            };
+
+            const closeViewModal = () => {
+                setViewState({
+                    showViewModal: false,
+                    apiToView: null
+                });
+            };
+
+            const showEditModal = async (apiId) => {
+                try {
+                    const response = await fetch(`/api/v1/configurations/${apiId}`);
+                    if (response.ok) {
+                        const apiData = await response.json();
+                        setEditState({
+                            showEditModal: true,
+                            apiToEdit: apiData,
+                            isUpdating: false,
+                            error: null,
+                            success: false
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching API details:', error);
+                }
+            };
+
+            const closeEditModal = () => {
+                setEditState({
+                    showEditModal: false,
+                    apiToEdit: null,
+                    isUpdating: false,
+                    error: null,
+                    success: false
+                });
+            };
+
+            const updateApi = async (updatedData) => {
+                setEditState(prev => ({ ...prev, isUpdating: true, error: null }));
+
+                try {
+                    const response = await fetch(`/api/v1/configurations/${updatedData.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({
+                            ...updatedData,
+                            updatedBy: 'admin'
+                        })
+                    });
+
+                    if (response.ok) {
+                        setEditState(prev => ({
+                            ...prev,
+                            isUpdating: false,
+                            success: true,
+                            error: null
+                        }));
+                        
+                        // Refresh the API list and close modal after success
+                        await fetchApis();
+                        await fetchStats();
+                        
+                        setTimeout(() => {
+                            closeEditModal();
+                        }, 1500);
+                    } else {
+                        const errorData = await response.text();
+                        setEditState(prev => ({
+                            ...prev,
+                            isUpdating: false,
+                            error: `Failed to update API: ${response.status} ${response.statusText}`
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Update error:', error);
+                    setEditState(prev => ({
+                        ...prev,
+                        isUpdating: false,
+                        error: `Network error: ${error.message}`
+                    }));
+                }
+            };
+
+            return (
+                <div className="w-full px-6 py-4 animate-slide-up">
+                    <div className="mb-4 text-center">
+                        <h2 className="text-2xl font-bold text-white mb-1">API Configuration Dashboard</h2>
+                        <p className="text-sm text-white text-opacity-90">Manage and monitor your MCP REST API configurations</p>
+                    </div>
+
+                    {/* Success Message */}
+                    {deleteState.success && (
+                        <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-400 rounded-lg">
+                            <div className="flex items-center">
+                                <i className="fas fa-check-circle text-green-400 text-xl mr-3"></i>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-green-800">Success!</h3>
+                                    <p className="text-green-700">API configuration deleted successfully.</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Error Message */}
+                    {deleteState.error && (
+                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-lg">
+                            <div className="flex items-center">
+                                <i className="fas fa-exclamation-circle text-red-400 text-xl mr-3"></i>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-red-800">Error</h3>
+                                    <p className="text-red-700">{deleteState.error}</p>
+                                </div>
+                                <button 
+                                    onClick={() => setDeleteState(prev => ({ ...prev, error: null }))}
+                                    className="ml-auto text-red-400 hover:text-red-600"
+                                >
+                                    <i className="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Delete Confirmation Modal */}
+                    {deleteState.showConfirmModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+                            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 animate-slide-up">
+                                <div className="p-6">
+                                    <div className="flex items-center mb-4">
+                                        <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                                            <i className="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-bold text-gray-900">Confirm Deletion</h3>
+                                            <p className="text-gray-600">This action cannot be undone</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="mb-6">
+                                        <p className="text-gray-700">
+                                            Are you sure you want to delete the API configuration 
+                                            <span className="font-semibold text-gray-900"> "{deleteState.apiToDelete?.name}"</span>?
+                                        </p>
+                                        <p className="text-sm text-gray-500 mt-2">
+                                            This will permanently remove the API configuration and all associated tools.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="flex space-x-3 justify-end">
+                                        <button
+                                            onClick={cancelDelete}
+                                            className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
+                                        >
+                                            <i className="fas fa-times mr-2"></i>Cancel
+                                        </button>
+                                        <button
+                                            onClick={confirmDelete}
+                                            className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md"
+                                        >
+                                            <i className="fas fa-trash mr-2"></i>Delete API
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* View API Details Modal */}
+                    {viewState.showViewModal && viewState.apiToView && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+                            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-slide-up">
+                                <div className="p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center">
+                                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                                <i className="fas fa-eye text-blue-600 text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-2xl font-bold text-gray-900">{viewState.apiToView.name}</h3>
+                                                <p className="text-gray-400 font-mono text-xs">{viewState.apiToView.id}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={closeViewModal}
+                                            className="text-gray-400 hover:text-gray-600 text-xl"
+                                        >
+                                            <i className="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Base URL</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{viewState.apiToView.baseUrl}</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                                                    viewState.apiToView.enabled 
+                                                        ? 'bg-green-100 text-green-800' 
+                                                        : 'bg-red-100 text-red-800'
+                                                }`}>
+                                                    {viewState.apiToView.enabled ? 'Active' : 'Inactive'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">OpenAPI Specification URL</label>
+                                            <p className="text-gray-900 bg-gray-50 p-3 rounded-lg break-all">{viewState.apiToView.openapiUrl}</p>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Timeout (seconds)</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{viewState.apiToView.timeoutSeconds}</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Rate Limit (req/min)</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{viewState.apiToView.rateLimitPerMinute}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        {viewState.apiToView.description && (
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{viewState.apiToView.description}</p>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Created</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
+                                                    {viewState.apiToView.createdAt ? new Date(viewState.apiToView.createdAt).toLocaleString() : 'N/A'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Last Updated</label>
+                                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
+                                                    {viewState.apiToView.updatedAt ? new Date(viewState.apiToView.updatedAt).toLocaleString() : 'N/A'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex justify-end mt-6 pt-6 border-t border-gray-200">
+                                        <button
+                                            onClick={closeViewModal}
+                                            className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
+                                        >
+                                            <i className="fas fa-times mr-2"></i>Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Edit API Modal */}
+                    {editState.showEditModal && editState.apiToEdit && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+                            <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-slide-up">
+                                <div className="p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center">
+                                            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
+                                                <i className="fas fa-edit text-yellow-600 text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-2xl font-bold text-gray-900">Edit API Configuration</h3>
+                                                <p className="text-gray-600">Modify API settings and configuration</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={closeEditModal}
+                                            className="text-gray-400 hover:text-gray-600 text-xl"
+                                        >
+                                            <i className="fas fa-times"></i>
+                                        </button>
+                                    </div>
+
+                                    {/* Success Message */}
+                                    {editState.success && (
+                                        <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-400 rounded-lg">
+                                            <div className="flex items-center">
+                                                <i className="fas fa-check-circle text-green-400 text-xl mr-3"></i>
+                                                <div>
+                                                    <h3 className="text-lg font-semibold text-green-800">Success!</h3>
+                                                    <p className="text-green-700">API configuration updated successfully.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Error Message */}
+                                    {editState.error && (
+                                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-lg">
+                                            <div className="flex items-center">
+                                                <i className="fas fa-exclamation-circle text-red-400 text-xl mr-3"></i>
+                                                <div>
+                                                    <h3 className="text-lg font-semibold text-red-800">Error</h3>
+                                                    <p className="text-red-700">{editState.error}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    <EditForm 
+                                        apiData={editState.apiToEdit} 
+                                        onUpdate={updateApi} 
+                                        isUpdating={editState.isUpdating}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Enhanced Stats Cards with Larger Fonts */}
+                    <div className="grid grid-cols-4 gap-4 mb-6">
+                        <div className="professional-card p-5 text-center">
+                            <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <i className="fas fa-server text-base text-white"></i>
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900">{stats.totalApis}</h3>
+                            <p className="text-gray-600 font-semibold text-sm">Total APIs</p>
+                        </div>
+                        <div className="professional-card p-5 text-center">
+                            <div className="w-10 h-10 gradient-success rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <i className="fas fa-check-circle text-base text-white"></i>
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900">{stats.activeApis}</h3>
+                            <p className="text-gray-600 font-semibold text-sm">Active APIs</p>
+                        </div>
+                        <div className="professional-card p-5 text-center">
+                            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <i className="fas fa-tools text-base text-white"></i>
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900">{stats.totalTools}</h3>
+                            <p className="text-gray-600 font-semibold text-sm">MCP Tools</p>
+                        </div>
+                        <div className="professional-card p-5 text-center">
+                            <div className="w-10 h-10 gradient-error rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <i className="fas fa-exclamation-triangle text-base text-white"></i>
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900">{stats.failedTests}</h3>
+                            <p className="text-gray-600 font-semibold text-sm">Failed Tests</p>
+                        </div>
+                    </div>
+
+                    {/* Large Prominent APIs Table */}
+                    <div className="professional-card overflow-hidden" style={{minHeight: '70vh'}}>
+                        <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-2xl font-bold text-gray-800">
+                                    <i className="fas fa-database mr-3 text-blue-600"></i>API Management Center
+                                </h3>
+                                <div className="flex space-x-3">
+                                    <button 
+                                        onClick={() => { 
+                                            setIsRefreshing(true); 
+                                            Promise.all([fetchApis(), fetchStats()])
+                                                .finally(() => setIsRefreshing(false));
+                                        }}
+                                        disabled={isRefreshing}
+                                        className="px-5 py-2.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg text-sm disabled:opacity-50"
+                                    >
+                                        <i className="fas fa-sync-alt mr-2"></i>Refresh
+                                    </button>
+                                    <button 
+                                        onClick={() => setCurrentView('add-api')}
+                                        className="px-5 py-2.5 gradient-primary text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg text-sm"
+                                    >
+                                        <i className="fas fa-plus mr-2"></i>Add New API
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto relative">
+                            {isRefreshing && (
+                                <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+                                    <div className="text-center">
+                                        <i className="fas fa-spinner fa-spin text-3xl text-blue-600 mb-2"></i>
+                                        <p className="text-gray-600 font-medium">Refreshing...</p>
+                                    </div>
+                                </div>
+                            )}
+                            {apis.length === 0 && !isRefreshing ? (
+                                <div className="text-center py-12">
+                                    <i className="fas fa-inbox text-4xl text-gray-400 mb-4"></i>
+                                    <h4 className="text-lg font-semibold text-gray-600 mb-2">No APIs Configured</h4>
+                                    <p className="text-gray-500 mb-6">Get started by adding your first API configuration</p>
+                                    <button 
+                                        onClick={() => setCurrentView('add-api')}
+                                        className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                                    >
+                                        <i className="fas fa-plus mr-2"></i>Add Your First API
+                                    </button>
+                                </div>
+                            ) : (
+                                <table className="min-w-full">
+                                    <thead className="bg-gradient-to-r from-gray-100 to-gray-200">
+                                        <tr>
+                                            <th className="px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">API Name</th>
+                                            <th className="px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Base URL</th>
+                                            <th className="px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                                            <th className="px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Tools</th>
+                                            <th className="px-8 py-5 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Last Test</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                        {apis.map((api, index) => (
+                                            <tr key={index} className="hover:bg-blue-50 transition-colors duration-200">
+                                                <td className="px-8 py-6 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center mr-4">
+                                                            <i className="fas fa-api text-white"></i>
+                                                        </div>
+                                                        <div>
+                                                            <button 
+                                                                onClick={() => setCurrentView(`api-details-${api.id}`)}
+                                                                className="text-lg font-bold text-blue-600 hover:text-blue-800 transition-colors cursor-pointer text-left"
+                                                            >
+                                                                {api.name}
+                                                            </button>
+                                                            <div className="text-xs text-gray-400 font-mono">{api.id}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-8 py-6 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-gray-900">{api.baseUrl}</div>
+                                                    <div className="text-xs text-gray-500">REST Endpoint</div>
+                                                </td>
+                                                <td className="px-8 py-6 whitespace-nowrap">
+                                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                                                        api.enabled 
+                                                            ? 'bg-green-100 text-green-800 border border-green-200' 
+                                                            : 'bg-red-100 text-red-800 border border-red-200'
+                                                    }`}>
+                                                        <i className={`fas ${api.enabled ? 'fa-check-circle' : 'fa-times-circle'} mr-2`}></i>
+                                                        {api.enabled ? 'Active' : 'Inactive'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-8 py-6 whitespace-nowrap">
+                                                    <div className="text-lg font-bold text-gray-900">{api.toolCount || 0}</div>
+                                                    <div className="text-xs text-gray-500">MCP Tools</div>
+                                                </td>
+                                                <td className="px-8 py-6 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">Never</div>
+                                                    <div className="text-xs text-gray-500">No tests run</div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Add API Form Component
+        const AddAPIForm = ({ setCurrentView }) => {
+            const [formData, setFormData] = useState({
+                name: '',
+                baseUrl: '',
+                description: '',
+                openApiSpec: '',
+                timeout: 30,
+                rateLimit: 100,
+                authType: 'NONE',
+                enabled: true,
+                validateSsl: true
+            });
+
+            const [formState, setFormState] = useState({
+                isSubmitting: false,
+                error: null,
+                success: false,
+                validationError: null
+            });
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setFormState({ isSubmitting: true, error: null, success: false, validationError: null });
+                
+                try {
+                    // Transform form data to match backend expectations
+                    const requestData = {
+                        name: formData.name,
+                        description: formData.description,
+                        enabled: formData.enabled,
+                        openapiSourceType: "URL",
+                        openapiUrl: formData.openApiSpec,
+                        openapiContent: null,
+                        baseUrl: formData.baseUrl,
+                        timeoutSeconds: parseInt(formData.timeout),
+                        rateLimitPerMinute: parseInt(formData.rateLimit),
+                        authConfig: formData.authType !== 'NONE' ? { type: formData.authType } : null,
+                        advancedConfig: {
+                            validateSsl: formData.validateSsl
+                        },
+                        createdBy: "admin",
+                        generateTools: true
+                    };
+
+                    console.log('Sending request data:', requestData);
+
+                    // Get CSRF token from meta tag or cookie
+                    let csrfToken = null;
+                    const csrfMeta = document.querySelector('meta[name="_csrf"]');
+                    if (csrfMeta) {
+                        csrfToken = csrfMeta.getAttribute('content');
+                    } else {
+                        // Try to get from cookie
+                        const cookies = document.cookie.split(';');
+                        for (let cookie of cookies) {
+                            const [name, value] = cookie.trim().split('=');
+                            if (name === 'XSRF-TOKEN') {
+                                csrfToken = decodeURIComponent(value);
+                                break;
+                            }
+                        }
+                    }
+
+                    const headers = {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    };
+
+                    if (csrfToken) {
+                        headers['X-XSRF-TOKEN'] = csrfToken;
+                        console.log('Adding CSRF token:', csrfToken);
+                    } else {
+                        console.warn('No CSRF token found');
+                    }
+
+                    const response = await fetch('/api/v1/configurations', {
+                        method: 'POST',
+                        headers: headers,
+                        credentials: 'same-origin',
+                        body: JSON.stringify(requestData)
+                    });
+
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', [...response.headers.entries()]);
+                    
+                    if (response.ok) {
+                        setFormState({ isSubmitting: false, error: null, success: true, validationError: null });
+                        // Reset form after success
+                        setTimeout(() => {
+                            setFormData({
+                                name: '',
+                                baseUrl: '',
+                                description: '',
+                                openApiSpec: '',
+                                timeout: 30,
+                                rateLimit: 100,
+                                authType: 'NONE',
+                                enabled: true,
+                                validateSsl: true
+                            });
+                            setCurrentView('dashboard');
+                        }, 2000);
+                    } else {
+                        let errorMessage = 'Failed to save API configuration';
+                        let responseBody = null;
+                        
+                        try {
+                            const responseText = await response.text();
+                            console.error('Raw response body:', responseText);
+                            
+                            if (responseText) {
+                                try {
+                                    responseBody = JSON.parse(responseText);
+                                    errorMessage = responseBody.message || responseBody.error || responseBody.details || `Server error: ${response.status} ${response.statusText}`;
+                                } catch (jsonError) {
+                                    errorMessage = `Server error: ${response.status} ${response.statusText} - ${responseText}`;
+                                }
+                            } else {
+                                errorMessage = `Server error: ${response.status} ${response.statusText}`;
+                            }
+                        } catch (parseError) {
+                            console.error('Error parsing response:', parseError);
+                            errorMessage = `Server error: ${response.status} ${response.statusText}`;
+                        }
+                        
+                        console.error('Server Error Response:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            body: responseBody,
+                            headers: [...response.headers.entries()]
+                        });
+                        
+                        setFormState({ 
+                            isSubmitting: false, 
+                            error: errorMessage, 
+                            success: false, 
+                            validationError: null 
+                        });
+                    }
+                } catch (error) {
+                    console.error('Network Error:', error);
+                    setFormState({ 
+                        isSubmitting: false, 
+                        error: `Network error: ${error.message || 'Unable to connect to server'}`, 
+                        success: false, 
+                        validationError: null 
+                    });
+                }
+            };
+
+            const validateOpenAPISpec = async () => {
+                if (!formData.openApiSpec) {
+                    setFormState(prev => ({ ...prev, validationError: 'Please enter an OpenAPI specification URL first.' }));
+                    return;
+                }
+                
+                setFormState(prev => ({ ...prev, validationError: null }));
+                
+                try {
+                    const response = await fetch(formData.openApiSpec);
+                    if (response.ok) {
+                        const spec = await response.json();
+                        if (spec.openapi || spec.swagger) {
+                            setFormState(prev => ({ ...prev, validationError: null, success: true }));
+                            setTimeout(() => setFormState(prev => ({ ...prev, success: false })), 3000);
+                        } else {
+                            setFormState(prev => ({ ...prev, validationError: 'Invalid OpenAPI specification format.' }));
+                        }
+                    } else {
+                        setFormState(prev => ({ ...prev, validationError: 'Unable to fetch OpenAPI specification from the provided URL.' }));
+                    }
+                } catch (error) {
+                    setFormState(prev => ({ ...prev, validationError: 'Error validating OpenAPI specification: ' + error.message }));
+                }
+            };
+
+            const handleChange = (e) => {
+                const { name, value, type, checked } = e.target;
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: type === 'checkbox' ? checked : value
+                }));
+            };
+
+            return (
+                <div className="w-full px-8 py-8 animate-slide-up">
+                    <div className="mb-8 text-center">
+                        <h2 className="text-3xl font-bold text-white mb-2">Add New API Configuration</h2>
+                        <p className="text-lg text-white text-opacity-90">Configure a new REST API for MCP tool generation</p>
+                    </div>
+
+                    <div className="max-w-6xl mx-auto">
+                        <div className="professional-card p-8 shadow-luxury">
+                            
+                            {/* Success Message */}
+                            {formState.success && (
+                                <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-400 rounded-lg">
+                                    <div className="flex items-center">
+                                        <i className="fas fa-check-circle text-green-400 text-xl mr-3"></i>
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-green-800">Success!</h3>
+                                            <p className="text-green-700">API configuration saved successfully. Redirecting to dashboard...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Error Message */}
+                            {formState.error && (
+                                <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-lg">
+                                    <div className="flex items-center">
+                                        <i className="fas fa-exclamation-circle text-red-400 text-xl mr-3"></i>
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-red-800">Error</h3>
+                                            <p className="text-red-700">{formState.error}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Validation Error Message */}
+                            {formState.validationError && (
+                                <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
+                                    <div className="flex items-center">
+                                        <i className="fas fa-exclamation-triangle text-yellow-400 text-xl mr-3"></i>
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-yellow-800">Validation Error</h3>
+                                            <p className="text-yellow-700">{formState.validationError}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                        <form onSubmit={handleSubmit} className="space-y-8">
+                            {/* API Name - Full Width */}
+                            <div>
+                                <label className="block text-lg font-semibold text-gray-700 mb-3">
+                                    <i className="fas fa-tag mr-3 text-blue-600"></i>API Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-lg font-medium shadow-sm hover:shadow-md"
+                                    placeholder="Enter a descriptive name for your API"
+                                    required
+                                />
+                            </div>
+
+                            {/* Base URL - Full Width */}
+                            <div>
+                                <label className="block text-lg font-semibold text-gray-700 mb-3">
+                                    <i className="fas fa-link mr-3 text-green-600"></i>Base URL *
+                                </label>
+                                <input
+                                    type="url"
+                                    name="baseUrl"
+                                    value={formData.baseUrl}
+                                    onChange={handleChange}
+                                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-lg font-medium shadow-sm hover:shadow-md"
+                                    placeholder="https://api.example.com"
+                                    required
+                                />
+                            </div>
+
+                            {/* OpenAPI Specification - Full Width */}
+                            <div>
+                                <label className="block text-lg font-semibold text-gray-700 mb-3">
+                                    <i className="fas fa-file-code mr-3 text-purple-600"></i>OpenAPI Specification URL *
+                                </label>
+                                <input
+                                    type="url"
+                                    name="openApiSpec"
+                                    value={formData.openApiSpec}
+                                    onChange={handleChange}
+                                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-lg font-medium shadow-sm hover:shadow-md"
+                                    placeholder="https://api.example.com/openapi.json or https://api.example.com/swagger.json"
+                                    required
+                                />
+                            </div>
+
+                            {/* Configuration Settings */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-clock mr-2"></i>Timeout (seconds)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="timeout"
+                                        value={formData.timeout}
+                                        onChange={handleChange}
+                                        min="1"
+                                        max="300"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-tachometer-alt mr-2"></i>Rate Limit (req/min)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="rateLimit"
+                                        value={formData.rateLimit}
+                                        onChange={handleChange}
+                                        min="1"
+                                        max="10000"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-shield-alt mr-2"></i>Authentication
+                                    </label>
+                                    <select
+                                        name="authType"
+                                        value={formData.authType}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                                    >
+                                        <option value="NONE">None</option>
+                                        <option value="API_KEY">API Key</option>
+                                        <option value="BEARER_TOKEN">Bearer Token</option>
+                                        <option value="BASIC_AUTH">Basic Auth</option>
+                                        <option value="OAUTH2">OAuth 2.0</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Options */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="flex items-center space-x-3 p-4 bg-gray-50 bg-opacity-50 rounded-lg">
+                                    <input
+                                        type="checkbox"
+                                        name="enabled"
+                                        checked={formData.enabled}
+                                        onChange={handleChange}
+                                        className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                    />
+                                    <label className="text-sm font-medium text-gray-700">
+                                        <i className="fas fa-power-off mr-2"></i>Enable API
+                                    </label>
+                                </div>
+                                <div className="flex items-center space-x-3 p-4 bg-gray-50 bg-opacity-50 rounded-lg">
+                                    <input
+                                        type="checkbox"
+                                        name="validateSsl"
+                                        checked={formData.validateSsl}
+                                        onChange={handleChange}
+                                        className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                    />
+                                    <label className="text-sm font-medium text-gray-700">
+                                        <i className="fas fa-lock mr-2"></i>Validate SSL Certificates
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Description - Moved to End */}
+                            <div>
+                                <label className="block text-lg font-semibold text-gray-700 mb-3">
+                                    <i className="fas fa-align-left mr-3 text-orange-600"></i>Description
+                                </label>
+                                <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    rows="4"
+                                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-lg font-medium shadow-sm hover:shadow-md resize-vertical"
+                                    placeholder="Provide a detailed description of what this API does, its purpose, and any important notes..."
+                                />
+                            </div>
+
+                            {/* Professional Buttons with Loading States */}
+                            <div className="mt-8 pt-6 border-t-2 border-gray-100">
+                                <div className="flex justify-center space-x-4">
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            try {
+                                                // First test GET to see if we can read configurations
+                                                console.log('Testing GET /api/v1/configurations...');
+                                                const getResponse = await fetch('/api/v1/configurations', {
+                                                    method: 'GET',
+                                                    credentials: 'same-origin'
+                                                });
+                                                console.log('GET status:', getResponse.status);
+                                                const getData = await getResponse.text();
+                                                console.log('GET response:', getData);
+                                                
+                                                // Now test POST with minimal data
+                                                const testData = {
+                                                    name: "Test API " + Date.now(),
+                                                    description: "Test Description",
+                                                    enabled: true,
+                                                    openapiSourceType: "URL",
+                                                    openapiUrl: "https://jsonplaceholder.typicode.com/openapi.json",
+                                                    openapiContent: null,
+                                                    baseUrl: "https://jsonplaceholder.typicode.com",
+                                                    timeoutSeconds: 30,
+                                                    rateLimitPerMinute: 100,
+                                                    authConfig: null,
+                                                    advancedConfig: { validateSsl: true },
+                                                    createdBy: "admin",
+                                                    generateTools: false
+                                                };
+                                                
+                                                console.log('Testing POST with data:', testData);
+                                                
+                                                const response = await fetch('/api/v1/configurations', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json'
+                                                    },
+                                                    credentials: 'same-origin',
+                                                    body: JSON.stringify(testData)
+                                                });
+                                                
+                                                console.log('POST test status:', response.status);
+                                                console.log('POST response headers:', Object.fromEntries(response.headers.entries()));
+                                                
+                                                const responseText = await response.text();
+                                                console.log('POST response body:', responseText);
+                                                
+                                                // Try to parse as JSON if possible
+                                                try {
+                                                    const jsonResponse = JSON.parse(responseText);
+                                                    console.log('Parsed JSON response:', jsonResponse);
+                                                } catch (e) {
+                                                    console.log('Response is not JSON');
+                                                }
+                                                
+                                                alert(`POST test: ${response.status} - Check console for detailed logs`);
+                                            } catch (error) {
+                                                console.error('POST test error:', error);
+                                                alert(`POST test failed: ${error.message}`);
+                                            }
+                                        }}
+                                        className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                                    >
+                                        Test API Access
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={validateOpenAPISpec}
+                                        disabled={formState.isSubmitting || !formData.openApiSpec}
+                                        className={`px-8 py-4 rounded-xl transition-all duration-300 font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-105 ${
+                                            formState.isSubmitting || !formData.openApiSpec
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : 'bg-gradient-to-r from-gray-600 to-gray-700 text-white hover:from-gray-700 hover:to-gray-800'
+                                        }`}
+                                    >
+                                        <i className="fas fa-check-circle mr-2"></i>Validate OpenAPI
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={formState.isSubmitting}
+                                        className={`px-8 py-4 rounded-xl transition-all duration-300 font-semibold text-lg shadow-md hover:shadow-lg transform hover:scale-105 ${
+                                            formState.isSubmitting
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : 'gradient-primary text-white hover:from-blue-700 hover:to-blue-800'
+                                        }`}
+                                    >
+                                        {formState.isSubmitting ? (
+                                            <>
+                                                <i className="fas fa-spinner fa-spin mr-2"></i>Saving...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="fas fa-save mr-2"></i>Save Configuration
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                                <p className="text-center text-gray-500 mt-4 text-sm">
+                                    {formState.isSubmitting 
+                                        ? 'Please wait while we save your configuration...' 
+                                        : 'Click "Validate OpenAPI" to test your configuration before saving'
+                                    }
+                                </p>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            const [currentView, setCurrentView] = useState('dashboard');
+
+            // Extract API ID from view if it's an API details page
+            const getApiIdFromView = (view) => {
+                if (view.startsWith('api-details-')) {
+                    return view.replace('api-details-', '');
+                }
+                return null;
+            };
+
+            const apiId = getApiIdFromView(currentView);
+
+            return (
+                <div className="full-page-layout">
+                    <Header currentView={currentView} setCurrentView={setCurrentView} />
+                    <main className="main-content-full">
+                        {currentView === 'dashboard' && <Dashboard setCurrentView={setCurrentView} />}
+                        {currentView === 'add-api' && <AddAPIForm setCurrentView={setCurrentView} />}
+                        {apiId && <APIDetailsPage apiId={apiId} setCurrentView={setCurrentView} />}
+                    </main>
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('app'));
+    </script>
+</body>
+</html>
