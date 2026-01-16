@@ -1,4 +1,4 @@
-# MCP REST Adapter
+# AutoMCP - MCP REST Adapter
 
 [![Java 21](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
 [![Spring Boot 3.x](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)](https://spring.io/projects/spring-boot)
@@ -10,7 +10,7 @@
 
 **The Problem**: AI agents and LLMs can't directly interact with your existing REST APIs. You need to manually create tool definitions, handle authentication, manage connections, and write custom integration code for every API.
 
-**The Solution**: MCP REST Adapter automatically converts any REST API (with OpenAPI specification) into ready-to-use tools that AI agents can discover and execute. No coding required - just point it to your API documentation and you're done.
+**The Solution**: AutoMCP automatically converts any REST API (with OpenAPI specification) into ready-to-use tools that AI agents can discover and execute. No coding required - just point it to your API documentation and you're done.
 
 **Business Value**:
 - ⚡ **Instant AI Integration** - Connect existing APIs to AI workflows in minutes, not weeks
